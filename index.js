@@ -7,8 +7,18 @@ const app = express();
 app.use(express.json());
 
 // Carga tus variables del archivo .env
+const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
+
+// Middleware de autenticación por token
+app.use((req, res, next) => {
+    const auth = req.headers.authorization || '';
+    if (!auth.startsWith('Bearer ') || auth.split(' ')[1] !== AUTH_TOKEN) {
+      return res.status(401).json({ error: 'No autorizado' });
+    }
+    next();
+  });
 
 // Configura un cliente Axios para hablar con Supabase REST API
 const supabaseClient = axios.create({
